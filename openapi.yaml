@@ -1,0 +1,1728 @@
+openapi: 3.0.3
+info:
+  title: 陌生人聊天软件
+  description: |
+    陌生人聊天软件的服务端接口
+  contact:
+    name: 舞动轻语
+    url: https://github.com/whisperingmoves
+    email: whisperingmoves@126.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.txt
+  version: 0.0.1
+servers:
+  - url: https://{host}:{port}/{basePath}
+    description: 开发环境API服务器
+    variables:
+      host:
+        enum:
+          - '127.0.0.1'
+        default: '127.0.0.1'
+        description: 主机名
+      port:
+        enum:
+          - '8080'
+        default: '8080'
+        description: 服务端口
+      basePath:
+        enum:
+          - v1
+        default: v1
+        description: Api 版本
+tags:
+  - name: smsVerificationCodes
+    description: |
+      - 发送短信验证码
+      - 验证手机号码
+  - name: users
+    description: |
+      - 创建用户
+      - 获取用户列表
+      - 获取用户资料
+      - 修改用户资料
+  - name: posts
+    description: |
+      - 获取帖子列表
+      - 分享帖子
+      - 点赞帖子
+      - 取消点赞帖子
+      - 评论帖子
+      - 删除帖子评论
+      - 创建帖子
+      - 获取用户帖子列表
+  - name: upload
+    description: |
+      - 上传文件
+  - name: notifications
+    description: |
+      - 获取通知列表
+paths:
+  /sms_verification_codes:
+    summary: 短信验证码相关操作
+    description: |
+      - 发送短信验证码
+      - 验证手机号码
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+    post:
+      tags:
+        - smsVerificationCodes
+      summary: 发送短信验证码
+      description: 发送短信验证码至指定手机号码
+      operationId: createSmsVerificationCode
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/CreateSmsVerificationCode'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+      security:
+        [ ]
+    patch:
+      tags:
+        - smsVerificationCodes
+      summary: 验证手机号码
+      description: 验证短信验证码和手机号是否匹配
+      operationId: updateSmsVerificationCode
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateSmsVerificationCode'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/UpdateSmsVerificationCodeResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+      security:
+        [ ]
+  /users:
+    summary: 用户相关操作
+    description: |
+      - 创建用户
+      - 获取用户列表
+      - 修改用户资料
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+    post:
+      tags:
+        - users
+      summary: 创建用户
+      description: |
+        通过短信验证过的手机号、性别、生日、头像字段创建用户
+      operationId: createUser
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/CreateUserRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/CreateUserResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+      security:
+        [ ]
+    get:
+      tags:
+        - users
+      summary: 获取用户列表
+      description: |
+        获取最近更新了动态的用户列表，按照时间倒序排序
+      operationId: listUser
+      parameters:
+        - $ref: '#/components/parameters/PageRequestQuery'
+        - $ref: '#/components/parameters/PageSizeRequestQuery'
+        - $ref: '#/components/parameters/RefreshTimestampRequestQuery'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/ListUserResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+    patch:
+      tags:
+        - users
+      summary: 修改用户资料
+      description: 修改当前用户资料
+      operationId: updateUser
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateUserRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /users/{userId}:
+    summary: 用户资料相关操作
+    description: |
+      - 获取用户资料
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/UserIDRequestPath'
+    get:
+      tags:
+        - users
+      summary: 获取用户资料
+      description: 查看用户资料
+      operationId: getUser
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/GetUserResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts:
+    summary: 帖子相关操作
+    description: |
+      - 获取帖子列表
+      - 创建帖子
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+    get:
+      tags:
+        - posts
+      summary: 获取帖子列表
+      description: 分类获取帖子列表
+      operationId: listPosts
+      parameters:
+        - $ref: '#/components/parameters/PageRequestQuery'
+        - $ref: '#/components/parameters/PageSizeRequestQuery'
+        - $ref: '#/components/parameters/RefreshTimestampRequestQuery'
+        - $ref: '#/components/parameters/PostsCategoryRequestQuery'
+        - $ref: '#/components/parameters/FieldListRequestQuery'
+        - $ref: '#/components/parameters/KeywordRequestQuery'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/ListPostsResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+    post:
+      tags:
+        - posts
+      summary: 创建帖子
+      description: 发布新的帖子
+      operationId: createPosts
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/CreatePostsRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/CreatePostsResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{userId}:
+    summary: 用户帖子相关操作
+    description: |
+      - 获取用户帖子列表
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/UserIDRequestPath'
+    get:
+      tags:
+        - posts
+      summary: 获取用户帖子列表
+      description: 获取指定用户帖子列表
+      operationId: listUserPosts
+      parameters:
+        - $ref: '#/components/parameters/PageRequestQuery'
+        - $ref: '#/components/parameters/PageSizeRequestQuery'
+        - $ref: '#/components/parameters/RefreshTimestampRequestQuery'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/ListUserPostsResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{postsId}/share:
+    summary: 帖子分享相关操作
+    description: ｜
+      - 分享帖子
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PostsIDRequestPath'
+    post:
+      tags:
+        - posts
+      summary: 分享帖子
+      description: 成功分享帖子后调用此接口记录分享记录
+      operationId: createPostsShare
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{postsId}/liker:
+    summary: 帖子点赞相关操作
+    description: ｜
+      - 点赞帖子
+      - 取消点赞帖子
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PostsIDRequestPath'
+    post:
+      tags:
+        - posts
+      summary: 点赞帖子
+      description: 为喜欢的帖子点赞
+      operationId: createPostsLiker
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+    delete:
+      tags:
+        - posts
+      summary: 取消点赞帖子
+      description: 为曾经喜欢的帖子取消点赞
+      operationId: deletePostsLiker
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{postsId}/comment:
+    summary: 帖子评论相关操作
+    description: |
+      - 评论帖子
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PostsIDRequestPath'
+    post:
+      tags:
+        - posts
+      summary: 评论帖子
+      description: 对指定帖子发表评论
+      operationId: createPostsComment
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/CreatePostsCommentRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/CreatePostsCommentResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{postsId}/comment/{commentId}:
+    summary: 删除帖子评论相关操作
+    description: |
+      - 删除帖子评论
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PostsIDRequestPath'
+      - $ref: '#/components/parameters/CommentIDRequestPath'
+    delete:
+      tags:
+        - posts
+      summary: 删除帖子评论
+      description: 删除自己对指定帖子发表过的指定评论
+      operationId: deletePostsComment
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /upload:
+    summary: 文件上传相关操作
+    description: |
+      - 上传文件
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+    post:
+      tags:
+        - upload
+      summary: 上传文件
+      description: 上传一个或多个文件到服务器
+      operationId: uploadFile
+      parameters: [ ]
+      requestBody:
+        $ref: '#/components/requestBodies/UploadFileRequest'
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/UploadFileResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /notifications:
+    summary: 通知相关操作
+    description: |
+      - 获取帖子列表
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PageRequestQuery'
+      - $ref: '#/components/parameters/PageSizeRequestQuery'
+      - $ref: '#/components/parameters/RefreshTimestampRequestQuery'
+      - $ref: '#/components/parameters/NotificationCategoryRequestQuery'
+    get:
+      tags:
+        - notifications
+      summary: 获取通知列表
+      description: |
+        分类获取所有通知的列表：互动相关、状态相关、礼物相关、通知公告
+      operationId: listNotification
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/ListNotificationResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+components:
+  schemas:
+    UserAgentRequestHeader:
+      type: string
+      minLength: 5
+      maxLength: 255
+      description: |
+        由三部分信息组成：
+        - 浏览器/App：Chrome 83.0.4103.101
+        - 设备：MI 8 Build/QKQ1.190828.002 Mobile
+        - 操作系统：Android 10
+      example: Mozilla/5.0 (Linux; Android 10; MI 8 Build/QKQ1.190828.002; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/83.0.4103.101 Mobile Safari/537.36
+      deprecated: false
+    DeviceIDRequestHeader:
+      type: string
+      minLength: 1
+      maxLength: 50
+      description: 设备唯一ID
+      example: 7ca9d6253bc743f6a58e01f13619853c
+      deprecated: false
+    RequestIDRequestHeader:
+      type: string
+      minLength: 36
+      maxLength: 36
+      description: 请求唯一ID
+      example: b55696f0-dac9-47d3-a3ed-00db20685295
+      deprecated: false
+    CreateSmsVerificationCode:
+      type: object
+      required:
+        - phoneNumber
+        - event
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        event:
+          $ref: '#/components/schemas/Event'
+    UpdateSmsVerificationCode:
+      type: object
+      required:
+        - phoneNumber
+        - event
+        - code
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        event:
+          $ref: '#/components/schemas/Event'
+        code:
+          $ref: '#/components/schemas/VerificationCode'
+    VerificationCode:
+      type: string
+      minLength: 4
+      maxLength: 10
+      description: 验证码
+      example: 1234
+      deprecated: false
+    PhoneNumber:
+      type: string
+      minLength: 1
+      description: 手机号码
+      example: 19113483973
+      deprecated: false
+    UploadFileRequestItem:
+      type: string
+      format: binary
+      minLength: 1
+      maxLength: 8388608
+      description: 文件二进制内容
+      deprecated: false
+    UploadFileRequest:
+      type: object
+      required:
+        - files
+      properties:
+        files:
+          type: array
+          minItems: 1
+          maxItems: 9
+          items:
+            $ref: '#/components/schemas/UploadFileRequestItem'
+    Event:
+      type: integer
+      format: int32
+      enum:
+        - 1
+      description: Event:1=注册/登录
+      example: 1
+      deprecated: false
+    RequestIDResponseHeader:
+      type: string
+      minLength: 36
+      maxLength: 36
+      description: 请求唯一ID
+      example: b55696f0-dac9-47d3-a3ed-00db20685295
+      deprecated: false
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          $ref: '#/components/schemas/Code'
+        message:
+          $ref: '#/components/schemas/Message'
+    Code:
+      type: string
+      minLength: 3
+      maxLength: 50
+      description: |
+        ### 错误代码命名约定
+
+        - 遵循驼峰式
+        - 错误代码有两个级别。 例如，“InvalidParameter.BindError”，以“.”符号分隔。 其中，一级错误码为平台级，二级错误码为资源级，可根据场景定制
+        - 二级错误码只能使用英文字母或数字（[a-zA-Z0-9]），且应使用英文单词标准拼写、标准缩写、RFC术语缩写等
+        - 错误代码应避免相同语义的多个定义，例如：`InvalidParameter.ErrorBind`、`InvalidParameter.BindError`
+
+        ### 一级公共错误码
+
+        | 错误代码 | 错误描述 | 错误类型 |
+        | ---- | ---- | ---- |
+        | InternalError | 服务器内部错误 | 1 |
+        | InvalidParameter | 参数错误（包括参数类型、格式、值等） | 0 |
+        | AuthFailure | 认证/授权错误 | 0 |
+        | ResourceNotFound | 资源不存在 | 0 |
+        | FailedOperation | 操作失败 | 2 |
+
+        > 错误类型: 0代表客户端, 1代表服务端, 2代表客户端/服务端
+      example: InvalidParameter.BadAuthenticationData
+      deprecated: false
+    Message:
+      type: string
+      minLength: 1
+      maxLength: 100
+      description: 错误提示信息
+      example: 身份验证数据错误。
+      deprecated: false
+    Avatar:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: 头像
+      example: /order/images/chuanNumber/twincard.png
+      deprecated: false
+    TargetUrl:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: 头像
+      example: /order/images/chuanNumber/twincard.png
+      deprecated: false
+    Locale:
+      type: number
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 语言和地区:1=简体中文语言和中国地区,2=英语语言
+      example: 1
+      deprecated: false
+    CityName:
+      type: string
+      minLength: 1
+      maxLength: 500
+      description: 城市全称
+      example: Los Angeles
+      deprecated: false
+    LikerCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 点赞数量
+      example: 97
+      default: 0
+      deprecated: false
+    GiftCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 礼物数量
+      example: 97
+      default: 0
+      deprecated: false
+    FollowingCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 我关注用户数量
+      example: 97
+      default: 0
+      deprecated: false
+    FollowCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 关注我用户数量
+      example: 97
+      default: 0
+      deprecated: false
+    VisitedMeCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 我的访客数量
+      example: 97
+      default: 0
+      deprecated: false
+    CommentCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 评论数量
+      example: 97
+      default: 0
+      deprecated: false
+    ShareCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 分享数量
+      example: 97
+      default: 0
+      deprecated: false
+    HotCount:
+      type: integer
+      format: int64
+      minimum: 0
+      description: 热门指数
+      example: 97
+      default: 0
+      deprecated: false
+    Longitude:
+      type: string
+      minLength: 1
+      maxLength: 11
+      description: 经度
+      example: -122.085589
+      deprecated: false
+    Latitude:
+      type: string
+      minLength: 1
+      maxLength: 11
+      description: 纬度
+      example: 37.421542
+      deprecated: false
+    Visibility:
+      type: number
+      enum:
+        - 1
+        - 2
+        - 3
+      description: 可见性:1=公开,2=主页可见,3=仅自己可见
+      default: 1
+      example: 1
+      deprecated: false
+    Gender:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 性别:1=男,2=女
+      example: 1
+      deprecated: false
+    Birthday:
+      type: string
+      minLength: 10
+      description: 用 'YYYY-MM-DD' 的格式表示的生日信息
+      example: 1990-05-25
+      deprecated: false
+    CreateUserRequest:
+      type: object
+      required:
+        - phoneNumber
+        - gender
+        - birthday
+        - avatar
+        - locale
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        gender:
+          $ref: '#/components/schemas/Gender'
+        birthday:
+          $ref: '#/components/schemas/Birthday'
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        locale:
+          $ref: '#/components/schemas/Locale'
+    UpdateUserRequest:
+      type: object
+      required: [ ]
+      properties:
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        username:
+          $ref: '#/components/schemas/Username'
+    CreatePostsRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          $ref: '#/components/schemas/PostsContent'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        visibility:
+          $ref: '#/components/schemas/Visibility'
+        photoList:
+          $ref: '#/components/schemas/PhotoList'
+        mentionedUserList:
+          $ref: '#/components/schemas/MentionedUserList'
+    CreateUserResponse:
+      type: object
+      required:
+        - id
+        - token
+      properties:
+        id:
+          $ref: '#/components/schemas/UserID'
+        token:
+          $ref: '#/components/schemas/Token'
+        cityName:
+          $ref: '#/components/schemas/CityName'
+        freeWarmUpTimes:
+          $ref: '#/components/schemas/FreeWarmUpTimes'
+    CreatePostsResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/PostsID'
+    CreatePostsCommentResponse:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/PostsCommentID'
+    LoginResponse:
+      type: object
+      required:
+        - id
+        - token
+        - phoneNumber
+        - gender
+        - birthday
+        - avatar
+      properties:
+        id:
+          $ref: '#/components/schemas/UserID'
+        token:
+          $ref: '#/components/schemas/Token'
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        gender:
+          $ref: '#/components/schemas/Gender'
+        birthday:
+          $ref: '#/components/schemas/Birthday'
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        cityName:
+          $ref: '#/components/schemas/CityName'
+        freeWarmUpTimes:
+          $ref: '#/components/schemas/FreeWarmUpTimes'
+        username:
+          $ref: '#/components/schemas/Username'
+        giftCount:
+          $ref: '#/components/schemas/GiftCount'
+        followingCount:
+          $ref: '#/components/schemas/FollowingCount'
+        followCount:
+          $ref: '#/components/schemas/FollowCount'
+        visitedMeCount:
+          $ref: '#/components/schemas/VisitedMeCount'
+    GetUserResponse:
+      type: object
+      required:
+        - id
+        - gender
+        - birthday
+        - avatar
+      properties:
+        id:
+          $ref: '#/components/schemas/UserID'
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        gender:
+          $ref: '#/components/schemas/Gender'
+        birthday:
+          $ref: '#/components/schemas/Birthday'
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        cityName:
+          $ref: '#/components/schemas/CityName'
+        freeWarmUpTimes:
+          $ref: '#/components/schemas/FreeWarmUpTimes'
+        username:
+          $ref: '#/components/schemas/Username'
+        giftCount:
+          $ref: '#/components/schemas/GiftCount'
+        followingCount:
+          $ref: '#/components/schemas/FollowingCount'
+        followCount:
+          $ref: '#/components/schemas/FollowCount'
+        visitedMeCount:
+          $ref: '#/components/schemas/VisitedMeCount'
+    UserID:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 用户ID
+      example: 1
+      deprecated: false
+    PostsID:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 帖子ID
+      example: 1
+      deprecated: false
+    PostsCommentID:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 帖子评论ID
+      example: 1
+      deprecated: false
+    ParentPostsCommentID:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 父级帖子评论ID
+      example: 1
+      deprecated: false
+    Username:
+      type: string
+      minLength: 1
+      maxLength: 16
+      description: 用户名
+      example: Michaela
+      deprecated: false
+    Title:
+      type: string
+      minLength: 1
+      maxLength: 16
+      description: 标题
+      example: Update reminder
+      deprecated: false
+    PostsContent:
+      type: string
+      minLength: 1
+      maxLength: 2000
+      description: 帖子文字内容
+      example: Today’s shooting went well, thank you everyone
+      deprecated: false
+    PostsCommentContent:
+      type: string
+      minLength: 1
+      maxLength: 2000
+      description: 帖子评论文字内容
+      example: Today’s shooting went well, thank you everyone
+      deprecated: false
+    Token:
+      type: string
+      minLength: 1
+      maxLength: 255
+      description: Json web token
+      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjIsImV4cCI6MTY4NDc0NTE4MX0.BdESnb5xrexrAiNvhOQSTqghU83OCNePi_QTC0i_BPg
+      deprecated: false
+    PageRequestQuery:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 分页页码
+      example: 1
+      default: 1
+      deprecated: false
+    PageSizeRequestQuery:
+      type: integer
+      format: int64
+      minimum: 10
+      maximum: 30
+      description: 分页大小
+      example: 10
+      default: 10
+      deprecated: false
+    RefreshTimestampRequestQuery:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 刷新unix时间戳，精确到秒
+      example: 1689586220
+      deprecated: false
+    PostsCategoryRequestQuery:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      description: 帖子分类:1=我关注的人,2=推荐,3=最新,4=热门
+      default: 1
+      example: 1
+      deprecated: false
+    NotificationCategoryRequestQuery:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+        - 3
+        - 4
+      description: 通知分类:1=互动,2=状态,3=礼物,4=公告
+      default: 1
+      example: 1
+      deprecated: false
+    FieldListRequestQuery:
+      type: string
+      minLength: 1
+      maxLength: 255
+      description: 一个用逗号分隔的字段列表，指定需要返回的字段
+      example: likerCount,commentCount
+      deprecated: false
+    KeywordRequestQuery:
+      type: string
+      minLength: 1
+      maxLength: 2000
+      description: 搜索关键词，用户模糊匹配结果
+      example: likerCount,commentCount
+      deprecated: false
+    Description:
+      type: string
+      minLength: 1
+      maxLength: 200
+      description: 描述
+      example: Like your post
+      deprecated: false
+    ListUserResponse:
+      type: array
+      minItems: 1
+      maxItems: 30
+      items:
+        $ref: '#/components/schemas/ListUserItem'
+    ListNotificationResponse:
+      type: array
+      minItems: 1
+      maxItems: 30
+      items:
+        $ref: '#/components/schemas/ListNotificationItem'
+    ListPostsResponse:
+      type: array
+      minItems: 1
+      maxItems: 30
+      items:
+        $ref: '#/components/schemas/ListPostsItem'
+    ListUserPostsResponse:
+      type: array
+      minItems: 1
+      maxItems: 30
+      items:
+        $ref: '#/components/schemas/ListUserPostsItem'
+    PhotoList:
+      type: array
+      minItems: 1
+      maxItems: 9
+      items:
+        $ref: '#/components/schemas/Photo'
+    MentionedUserList:
+      type: array
+      minItems: 1
+      maxItems: 30
+      items:
+        $ref: '#/components/schemas/UserID'
+    UpdatedAt:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 更新unix时间戳，精确到秒
+      example: 1689586220
+      deprecated: false
+    IsOnline:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 是否在线:1=否,2=是
+      example: 1
+      default: 1
+      deprecated: false
+    IsLiked:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 是否被我点赞:1=否,2=是
+      example: 1
+      default: 1
+      deprecated: false
+    IsFollowed:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 是否关注用户:1=否,2=是
+      example: 1
+      default: 1
+      deprecated: false
+    FreeWarmUpTimes:
+      type: integer
+      format: int32
+      minimum: 0
+      description: 免费火苗加热次数
+      example: 3
+      default: 0
+      deprecated: false
+    Photo:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: 照片
+      example: /order/images/chuanNumber/twincard.png
+      deprecated: false
+    Relation:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+        - 3
+      description: 用户关系:1=Mutual,2=New,3=Follow
+      example: 1
+      deprecated: false
+    ListUserItem:
+      type: object
+      required:
+        - id
+        - updatedAt
+        - avatar
+      properties:
+        id:
+          $ref: '#/components/schemas/UserID'
+        username:
+          $ref: '#/components/schemas/Username'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        isOnline:
+          $ref: '#/components/schemas/IsOnline'
+        photo:
+          $ref: '#/components/schemas/Photo'
+        relation:
+          $ref: '#/components/schemas/Relation'
+    ListNotificationItem:
+      type: object
+      required:
+        - id
+        - updatedAt
+        - avatar
+        - title
+        - description
+      properties:
+        id:
+          $ref: '#/components/schemas/UserID'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        title:
+          $ref: '#/components/schemas/Title'
+        description:
+          $ref: '#/components/schemas/Description'
+        Photo:
+          $ref: '#/components/schemas/Photo'
+        targetUrl:
+          $ref: '#/components/schemas/TargetUrl'
+    ListPostsItem:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          $ref: '#/components/schemas/PostsID'
+        userId:
+          $ref: '#/components/schemas/UserID'
+        avatar:
+          $ref: '#/components/schemas/Avatar'
+        username:
+          $ref: '#/components/schemas/Username'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        photoList:
+          $ref: '#/components/schemas/PhotoList'
+        content:
+          $ref: '#/components/schemas/PostsContent'
+        mentionedUserList:
+          $ref: '#/components/schemas/MentionedUserList'
+        cityName:
+          $ref: '#/components/schemas/CityName'
+        likerCount:
+          $ref: '#/components/schemas/LikerCount'
+        commentCount:
+          $ref: '#/components/schemas/CommentCount'
+        shareCount:
+          $ref: '#/components/schemas/ShareCount'
+        hotCount:
+          $ref: '#/components/schemas/HotCount'
+        isLiked:
+          $ref: '#/components/schemas/IsLiked'
+        isFollowed:
+          $ref: '#/components/schemas/IsFollowed'
+    ListUserPostsItem:
+      type: object
+      required:
+        - id
+        - updatedAt
+      properties:
+        id:
+          $ref: '#/components/schemas/PostsID'
+        updatedAt:
+          $ref: '#/components/schemas/UpdatedAt'
+        photoList:
+          $ref: '#/components/schemas/PhotoList'
+        content:
+          $ref: '#/components/schemas/PostsContent'
+        mentionedUserList:
+          $ref: '#/components/schemas/MentionedUserList'
+        cityName:
+          $ref: '#/components/schemas/CityName'
+    PostsIDRequestPath:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 帖子ID
+      example: 1
+      deprecated: false
+    UserIDRequestPath:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 用户ID
+      example: 1
+      deprecated: false
+    CommentIDRequestPath:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 帖子评论ID
+      example: 1
+      deprecated: false
+    CreatePostsCommentRequest:
+      type: object
+      required:
+        - content
+      properties:
+        content:
+          $ref: '#/components/schemas/PostsCommentContent'
+        pid:
+          $ref: '#/components/schemas/ParentPostsCommentID'
+    UploadFileItem:
+      type: string
+      minLength: 3
+      maxLength: 255
+      description: 文件URL
+      example: /order/images/chuanNumber/twincard.png
+      deprecated: false
+    UploadFileResponse:
+        type: array
+        minItems: 1
+        maxItems: 9
+        items:
+          $ref: '#/components/schemas/UploadFileItem'
+  parameters:
+    UserAgentRequestHeader:
+      name: User-Agent
+      in: header
+      description: 一般HTTP协议中的User-Agent请求头字段用于告知服务器客户端的用户代理信息
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/UserAgentRequestHeader'
+    DeviceIDRequestHeader:
+      name: X-Device-ID
+      in: header
+      description: 通用HTTP协议中的X-Device-ID自定义请求头字段用于告知服务器客户端的唯一设备ID
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/DeviceIDRequestHeader'
+    RequestIDRequestHeader:
+      name: X-Request-ID
+      in: header
+      description: 通用HTTP协议中的X-Request-ID自定义请求头字段，用于告知服务器客户端的唯一请求ID
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/RequestIDRequestHeader'
+    PostsIDRequestPath:
+      name: postsId
+      in: path
+      description: 请求路径中的 postsId 字段用于标识唯一的帖子 ID
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/PostsIDRequestPath'
+    UserIDRequestPath:
+      name: userId
+      in: path
+      description: 请求路径中的 userId 字段用于标识唯一的用户 ID
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/UserIDRequestPath'
+    CommentIDRequestPath:
+      name: commentId
+      in: path
+      description: 请求路径中的 commentId 字段用于标识唯一的帖子评论 ID
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/CommentIDRequestPath'
+    PageRequestQuery:
+      name: page
+      in: query
+      description: 请求查询字符串中的页码字段，用于标识列表分页页码
+      required: false
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/PageRequestQuery'
+    PageSizeRequestQuery:
+      name: pageSize
+      in: query
+      description: 请求查询字符串中的页面大小字段，用于确定列表分页大小
+      required: false
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/PageSizeRequestQuery'
+    RefreshTimestampRequestQuery:
+      name: refreshTimestamp
+      in: query
+      description: 请求查询字符串中的刷新时间戳字段，以便根据时间戳范围查询列表，避免分页数据重复的问题
+      required: true
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/RefreshTimestampRequestQuery'
+    PostsCategoryRequestQuery:
+      name: category
+      in: query
+      description: |
+        帖子列表分类查询字段，支持如下分类：
+          - 我关注的人的发布的帖子，按照帖子发布时间从新到老排序
+          - 推荐的帖子，按照距离从近到远排序
+          - 最新的帖子，按照帖子发布时间从新到老排序
+          - 热门的帖子，按照热度从高到低排序
+      required: false
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/PostsCategoryRequestQuery'
+    NotificationCategoryRequestQuery:
+      name: category
+      in: query
+      description: |
+        通知列表分类查询字段，支持如下分类：
+          - 互动相关通知，具体包括：帖子被点赞、帖子被评论、帖子被分享、帖子被收藏、帖子被加热，有人关注了你，按照时间从新到老排序
+          - 状态相关通知，关注用户动态通知，具体包括：发布了新的帖子、更改了用户名、更改了头像，按照时间从新到老排序
+          - 礼物相关通知，送礼通知，按照时间从新到老排序
+          - 公告类通知，具体包括：更新提醒、系统通知、账号安全提示、金币购买结果通知，按照时间从新到老排序
+      required: false
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/NotificationCategoryRequestQuery'
+    FieldListRequestQuery:
+      name: fieldList
+      in: query
+      description: |
+        一个用逗号分隔的字段列表，指定需要返回的字段
+      required: false
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/FieldListRequestQuery'
+    KeywordRequestQuery:
+      name: keyword
+      in: query
+      description: |
+        搜索关键词，用户模糊匹配结果
+      required: false
+      deprecated: false
+      style: form
+      explode: true
+      allowReserved: true
+      schema:
+        $ref: '#/components/schemas/KeywordRequestQuery'
+  requestBodies:
+    CreateSmsVerificationCode:
+      description: 发送短信验证码请求正文内容
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateSmsVerificationCode'
+      required: true
+    UpdateSmsVerificationCode:
+      description: 验证手机号码请求正文内容
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateSmsVerificationCode'
+      required: true
+    CreateUserRequest:
+      description: 创建用户请求正文内容
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateUserRequest'
+    UpdateUserRequest:
+      description: 修改用户资料请求正文内容
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UpdateUserRequest'
+    CreatePostsRequest:
+      description: 创建帖子正文内容
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatePostsRequest'
+    CreatePostsCommentRequest:
+      description: 创建帖子评论请求正文内容
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatePostsCommentRequest'
+    UploadFileRequest:
+      description: 上传文件请求正文内容
+      content:
+        multipart/form-data:
+          schema:
+            $ref: '#/components/schemas/UploadFileRequest'
+          encoding:
+            file:
+              contentType: image/*
+      required: true
+  responses:
+    DefaultResponse:
+      description: 默认响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+    BadRequestErrorResponse:
+      description: |
+        超文本传输协议（HTTP）400 Bad Request 响应状态码表示服务器因某些被认为是客户端错误的原因（例如，请求语法错误、无效请求消息格式或者欺骗性请求路由），而无法或不会处理该请求。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    UnauthorizedErrorResponse:
+      description: |
+        状态码 401 Unauthorized 代表客户端错误，指的是由于缺乏目标资源要求的身份验证凭证，发送的请求未得到满足。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundErrorResponse:
+      description: |
+        HTTP响应状态码404 Not Found是指服务器无法找到所请求的资源。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerErrorResponse:
+      description: 在 HTTP 协议中，500 Internal Server Error 是表示服务器端错误的响应状态码，意味着所请求的服务器遇到意外的情况并阻止其执行请求。
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    CreateUserResponse:
+      description: 成功创建用户响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateUserResponse'
+    CreatePostsResponse:
+      description: 成功创建帖子响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatePostsResponse'
+      links:
+        CreatePostsShare:
+          $ref: '#/components/links/CreatePostsShare'
+        CreatePostsLiker:
+          $ref: '#/components/links/CreatePostsLiker'
+        DeletePostsLiker:
+          $ref: '#/components/links/DeletePostsLiker'
+        CreatePostsComment:
+          $ref: '#/components/links/CreatePostsComment'
+        DeletePostsComment:
+          $ref: '#/components/links/DeletePostsComment'
+    UpdateSmsVerificationCodeResponse:
+      description: 短信验证码验证通过并且直接返回用户信息
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/LoginResponse'
+      links:
+        GetUser:
+          $ref: '#/components/links/GetUser'
+        ListUserPosts:
+          $ref: '#/components/links/ListUserPosts'
+    GetUserResponse:
+      description: 获取用户资料响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetUserResponse'
+    ListUserResponse:
+      description: 用户列表响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListUserResponse'
+      links:
+        GetUser:
+          $ref: '#/components/links/GetUser'
+        ListUserPosts:
+          $ref: '#/components/links/ListUserPosts'
+    ListNotificationResponse:
+      description: 通知列表响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListNotificationResponse'
+    ListPostsResponse:
+      description: 帖子列表响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListPostsResponse'
+    ListUserPostsResponse:
+      description: 用户帖子列表响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListUserPostsResponse'
+      links:
+        CreatePostsShare:
+          $ref: '#/components/links/CreatePostsShare'
+        CreatePostsLiker:
+          $ref: '#/components/links/CreatePostsLiker'
+        DeletePostsLiker:
+          $ref: '#/components/links/DeletePostsLiker'
+        CreatePostsComment:
+          $ref: '#/components/links/CreatePostsComment'
+        DeletePostsComment:
+          $ref: '#/components/links/DeletePostsComment'
+    CreatePostsCommentResponse:
+      description: 成功创建帖子评论响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreatePostsCommentResponse'
+    UploadFileResponse:
+      description: 上传文件响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UploadFileResponse'
+  headers:
+    RequestIDResponseHeader:
+      description: 通用HTTP协议中的X-Request-ID自定义响应头字段用于告知客户端该请求的唯一ID
+      required: true
+      deprecated: false
+      style: simple
+      schema:
+        $ref: '#/components/schemas/RequestIDResponseHeader'
+      examples:
+        RequestIDExample:
+          $ref: '#/components/examples/RequestID'
+  examples:
+    RequestID:
+      summary: 请求ID
+      description: 请求唯一ID
+      value: b55696f0-dac9-47d3-a3ed-00db20685295
+  securitySchemes:
+    JWTAuth:
+      type: http
+      description: JWT认证
+      scheme: Bearer
+      bearerFormat: JWT
+  links:
+    CreatePostsShare:
+      operationId: createPostsShare
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 创建帖子分享
+    GetUser:
+      operationId: getUser
+      parameters:
+        userId: $response.body#/users/id
+      description: 使用 `userId` 获取用户资料
+    ListUserPosts:
+      operationId: listUserPosts
+      parameters:
+        userId: $response.body#/users/id
+      description: 使用 `userId` 获取用户帖子列表
+    CreatePostsLiker:
+      operationId: createPostsLiker
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 创建帖子点赞
+    DeletePostsLiker:
+      operationId: deletePostsLiker
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 删除帖子点赞
+    CreatePostsComment:
+      operationId: createPostsComment
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 创建帖子评论
+    DeletePostsComment:
+      operationId: deletePostsComment
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 删除帖子评论
+security:
+  - JWTAuth: [ ]
