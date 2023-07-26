@@ -57,6 +57,7 @@ tags:
   - name: notifications
     description: |
       - 获取通知列表
+      - 将通知设为已读
 paths:
   /sms_verification_codes:
     summary: 短信验证码相关操作
@@ -515,6 +516,36 @@ paths:
         500:
           $ref: '#/components/responses/InternalServerErrorResponse'
       deprecated: false
+  /notifications/{notificationId}:
+    summary: 通知项相关操作
+    description: |
+      - 将指定通知设为已读
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/NotificationIDRequestPath'
+    patch:
+      tags:
+        - notifications
+      summary: 将通知设为已读
+      description: 将指定通知设为已读
+      operationId: updateNotification
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
 components:
   schemas:
     UserAgentRequestHeader:
@@ -667,8 +698,18 @@ components:
       description: 头像
       example: /order/images/chuanNumber/twincard.png
       deprecated: false
+    ReadStatus:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 已读/未读状态:1=未读,2=已读
+      default: 1
+      example: 1
+      deprecated: false
     Locale:
-      type: number
+      type: integer
       format: int32
       enum:
         - 1
@@ -762,7 +803,7 @@ components:
       example: 37.421542
       deprecated: false
     Visibility:
-      type: number
+      type: integer
       enum:
         - 1
         - 2
@@ -1204,6 +1245,8 @@ components:
           $ref: '#/components/schemas/Photo'
         targetUrl:
           $ref: '#/components/schemas/TargetUrl'
+        readStatus:
+          $ref: '#/components/schemas/ReadStatus'
     ListPostsItem:
       type: object
       required:
@@ -1262,6 +1305,13 @@ components:
       format: int64
       minimum: 1
       description: 帖子ID
+      example: 1
+      deprecated: false
+    NotificationIDRequestPath:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 通知ID
       example: 1
       deprecated: false
     UserIDRequestPath:
@@ -1341,6 +1391,16 @@ components:
       explode: false
       schema:
         $ref: '#/components/schemas/PostsIDRequestPath'
+    NotificationIDRequestPath:
+      name: notificationId
+      in: path
+      description: 请求路径中的 notificationId 字段用于标识唯一的通知 ID
+      required: true
+      deprecated: false
+      style: simple
+      explode: false
+      schema:
+        $ref: '#/components/schemas/NotificationIDRequestPath'
     UserIDRequestPath:
       name: userId
       in: path
@@ -1619,6 +1679,9 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ListNotificationResponse'
+      links:
+        UpdateNotification:
+          $ref: '#/components/links/UpdateNotification'
     ListPostsResponse:
       description: 帖子列表响应
       headers:
@@ -1628,15 +1691,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ListPostsResponse'
-    ListUserPostsResponse:
-      description: 用户帖子列表响应
-      headers:
-        X-Request-ID:
-          $ref: '#/components/headers/RequestIDResponseHeader'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ListUserPostsResponse'
       links:
         CreatePostsShare:
           $ref: '#/components/links/CreatePostsShare'
@@ -1648,6 +1702,15 @@ components:
           $ref: '#/components/links/CreatePostsComment'
         DeletePostsComment:
           $ref: '#/components/links/DeletePostsComment'
+    ListUserPostsResponse:
+      description: 用户帖子列表响应
+      headers:
+        X-Request-ID:
+          $ref: '#/components/headers/RequestIDResponseHeader'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListUserPostsResponse'
     CreatePostsCommentResponse:
       description: 成功创建帖子评论响应
       headers:
@@ -1724,5 +1787,10 @@ components:
       parameters:
         postsId: $response.body#/posts/id
       description: 使用 `postsId` 删除帖子评论
+    UpdateNotification:
+      operationId: updateNotification
+      parameters:
+        notificationId: $response.body#/posts/id
+      description: 使用 `notificationId` 将通知设为已读
 security:
   - JWTAuth: [ ]
