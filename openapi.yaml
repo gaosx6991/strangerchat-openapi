@@ -717,6 +717,13 @@ components:
       description: 语言和地区:1=简体中文语言和中国地区,2=英语语言
       example: 1
       deprecated: false
+    Timezone:
+      type: string
+      minLength: 6
+      maxLength: 6
+      description: 时区，UTC偏移量
+      example: -07:00
+      deprecated: false
     CityName:
       type: string
       minLength: 1
@@ -763,6 +770,22 @@ components:
       description: 我的访客数量
       example: 97
       default: 0
+      deprecated: false
+    ConsecutiveSignInDays:
+      type: integer
+      format: int32
+      minimum: 0
+      maximum: 7
+      description: 连续签到天数
+      example: 7
+      default: 0
+      deprecated: false
+    LastSignInTime:
+      type: integer
+      format: int64
+      minimum: 1
+      description: 上次签到时间，精确到秒的unix时间戳
+      example: 1690427421
       deprecated: false
     CommentCount:
       type: integer
@@ -850,6 +873,8 @@ components:
           $ref: '#/components/schemas/Latitude'
         locale:
           $ref: '#/components/schemas/Locale'
+        timezone:
+          $ref: '#/components/schemas/Timezone'
     UpdateUserRequest:
       type: object
       required: [ ]
@@ -858,6 +883,18 @@ components:
           $ref: '#/components/schemas/Avatar'
         username:
           $ref: '#/components/schemas/Username'
+        longitude:
+          $ref: '#/components/schemas/Longitude'
+        latitude:
+          $ref: '#/components/schemas/Latitude'
+        locale:
+          $ref: '#/components/schemas/Locale'
+        timezone:
+          $ref: '#/components/schemas/Timezone'
+        consecutiveSignInDays:
+          $ref: '#/components/schemas/ConsecutiveSignInDays'
+        lastSignInTime:
+          $ref: '#/components/schemas/LastSignInTime'
     CreatePostsRequest:
       type: object
       required:
@@ -939,6 +976,10 @@ components:
           $ref: '#/components/schemas/FollowCount'
         visitedMeCount:
           $ref: '#/components/schemas/VisitedMeCount'
+        consecutiveSignInDays:
+          $ref: '#/components/schemas/ConsecutiveSignInDays'
+        lastSignInTime:
+          $ref: '#/components/schemas/LastSignInTime'
     GetUserResponse:
       type: object
       required:
@@ -971,6 +1012,10 @@ components:
           $ref: '#/components/schemas/FollowCount'
         visitedMeCount:
           $ref: '#/components/schemas/VisitedMeCount'
+        consecutiveSignInDays:
+          $ref: '#/components/schemas/ConsecutiveSignInDays'
+        lastSignInTime:
+          $ref: '#/components/schemas/LastSignInTime'
     UserID:
       type: integer
       format: int64
