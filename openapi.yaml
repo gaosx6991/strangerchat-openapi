@@ -51,6 +51,8 @@ tags:
       - 删除帖子评论
       - 创建帖子
       - 获取用户帖子列表
+      - 收藏帖子
+      - 取消收藏帖子
   - name: upload
     description: |
       - 上传文件
@@ -440,6 +442,58 @@ paths:
       summary: 删除帖子评论
       description: 删除自己对指定帖子发表过的指定评论
       operationId: deletePostsComment
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{postsId}/favorite:
+    summary: 帖子收藏相关操作
+    description: ｜
+      - 收藏帖子
+      - 取消收藏帖子
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PostsIDRequestPath'
+    post:
+      tags:
+        - posts
+      summary: 收藏帖子
+      description: 收藏感兴趣的帖子
+      operationId: createPostsFavorite
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+    delete:
+      tags:
+        - posts
+      summary: 取消收藏帖子
+      description: 取消收藏曾经感兴趣的帖子
+      operationId: deletePostsFavorite
       parameters: [ ]
       responses:
         default:
@@ -1221,6 +1275,16 @@ components:
       example: 1
       default: 1
       deprecated: false
+    IsFavorite:
+      type: integer
+      format: int32
+      enum:
+        - 1
+        - 2
+      description: 是否收藏帖子:1=否,2=是
+      example: 1
+      default: 1
+      deprecated: false
     FreeWarmUpTimes:
       type: integer
       format: int32
@@ -1327,6 +1391,8 @@ components:
           $ref: '#/components/schemas/IsLiked'
         isFollowed:
           $ref: '#/components/schemas/IsFollowed'
+        isFavorite:
+          $ref: '#/components/schemas/IsFavorite'
     ListUserPostsItem:
       type: object
       required:
@@ -1743,6 +1809,10 @@ components:
           $ref: '#/components/links/CreatePostsLiker'
         DeletePostsLiker:
           $ref: '#/components/links/DeletePostsLiker'
+        CreatePostsFavorite:
+          $ref: '#/components/links/CreatePostsFavorite'
+        DeletePostsFavorite:
+          $ref: '#/components/links/DeletePostsFavorite'
         CreatePostsComment:
           $ref: '#/components/links/CreatePostsComment'
         DeletePostsComment:
@@ -1822,6 +1892,16 @@ components:
       parameters:
         postsId: $response.body#/posts/id
       description: 使用 `postsId` 删除帖子点赞
+    CreatePostsFavorite:
+      operationId: createPostsFavorite
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 创建帖子收藏
+    DeletePostsFavorite:
+      operationId: deletePostsFavorite
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 删除帖子收藏
     CreatePostsComment:
       operationId: createPostsComment
       parameters:
