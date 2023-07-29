@@ -53,6 +53,7 @@ tags:
       - 获取用户帖子列表
       - 收藏帖子
       - 取消收藏帖子
+      - 加热帖子
   - name: upload
     description: |
       - 上传文件
@@ -327,6 +328,36 @@ paths:
       summary: 分享帖子
       description: 成功分享帖子后调用此接口记录分享记录
       operationId: createPostsShare
+      parameters: [ ]
+      responses:
+        default:
+          $ref: '#/components/responses/DefaultResponse'
+        200:
+          $ref: '#/components/responses/DefaultResponse'
+        400:
+          $ref: '#/components/responses/BadRequestErrorResponse'
+        401:
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        404:
+          $ref: '#/components/responses/NotFoundErrorResponse'
+        500:
+          $ref: '#/components/responses/InternalServerErrorResponse'
+      deprecated: false
+  /posts/{postsId}/warming:
+    summary: 帖子加热相关操作
+    description: ｜
+      - 加热帖子
+    parameters:
+      - $ref: '#/components/parameters/UserAgentRequestHeader'
+      - $ref: '#/components/parameters/DeviceIDRequestHeader'
+      - $ref: '#/components/parameters/RequestIDRequestHeader'
+      - $ref: '#/components/parameters/PostsIDRequestPath'
+    post:
+      tags:
+        - posts
+      summary: 加热帖子
+      description: 消耗火苗为中意的帖子加热，提高帖子的排名，让更多的人看到帖子
+      operationId: createPostsWarming
       parameters: [ ]
       responses:
         default:
@@ -1805,6 +1836,8 @@ components:
       links:
         CreatePostsShare:
           $ref: '#/components/links/CreatePostsShare'
+        CreatePostsWarming:
+          $ref: '#/components/links/CreatePostsWarming'
         CreatePostsLiker:
           $ref: '#/components/links/CreatePostsLiker'
         DeletePostsLiker:
@@ -1872,6 +1905,11 @@ components:
       parameters:
         postsId: $response.body#/posts/id
       description: 使用 `postsId` 创建帖子分享
+    CreatePostsWarming:
+      operationId: createPostsWarming
+      parameters:
+        postsId: $response.body#/posts/id
+      description: 使用 `postsId` 创建帖子加热
     GetUser:
       operationId: getUser
       parameters:
